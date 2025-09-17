@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   BookOpen,
   TrendingUp,
@@ -10,169 +10,250 @@ import {
   Brain,
   BarChart3,
   Users,
-  Star,
-  Clock,
   Target,
-  Zap,
   Search,
   Bell,
   User,
   Settings,
-  ChevronRight
-} from 'lucide-react';
+  PlayCircle,
+} from "lucide-react";
+import { Link } from "react-router-dom"; // ✅ import Link
 
 const Dashboard = () => {
-  const [loading, setLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState("overview");
+  const [mounted, setMounted] = useState(false);
 
-  const sidebarItems = [
-    { icon: BookOpen, label: 'Academics' },
-    { icon: MapPin, label: 'Global Programs' },
-    { icon: Award, label: 'Achievements' },
-    { icon: Users, label: 'Community' },
-    { icon: Calendar, label: 'Events' },
-    { icon: Brain, label: 'Research' },
-    { icon: BarChart3, label: 'Statistics' },
-    { icon: DollarSign, label: 'Funding' },
-  ];
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const stats = [
-    { icon: Users, label: 'Students', value: '25K+' },
-    { icon: Award, label: 'Awards', value: '1.2K+' },
-    { icon: Globe, label: 'Countries', value: '85+' },
-    { icon: BookOpen, label: 'Courses', value: '350+' },
+  const sidebarOptions = [
+    { id: "overview", icon: BookOpen, label: "Dashboard", active: true },
+    { id: "aptitude", icon: Brain, label: "Aptitude Test" },
+    { id: "steam", icon: TrendingUp, label: "STEAM Paths" },
+    { id: "career", icon: Target, label: "Career Planning" },
+    { id: "colleges", icon: MapPin, label: "College Directory" },
+    { id: "cutoff", icon: Award, label: "Cut-offs & Eligibility" },
+    { id: "scholarship", icon: DollarSign, label: "Scholarships" },
+    { id: "timeline", icon: Calendar, label: "Timeline Tracker" },
+    { id: "analytics", icon: BarChart3, label: "Analytics" },
   ];
 
   const coreFeatures = [
-    { icon: TrendingUp, title: 'Growth', desc: 'Sustainable development', color: 'bg-blue-100 text-blue-600', delay: 'animate-fadeInUp' },
-    { icon: MapPin, title: 'Global', desc: 'Worldwide presence', color: 'bg-green-100 text-green-600', delay: 'animate-fadeInUp' },
-    { icon: Award, title: 'Excellence', desc: 'Award winning faculty', color: 'bg-purple-100 text-purple-600', delay: 'animate-fadeInUp' },
-    { icon: Brain, title: 'Innovation', desc: 'Cutting-edge research', color: 'bg-pink-100 text-pink-600', delay: 'animate-fadeInUp' },
+    {
+      id: "aptitude",
+      icon: Brain,
+      title: "Aptitude & Interest Test",
+      description: "AI-powered assessment to discover your strengths",
+      color: "bg-gradient-to-br from-purple-500 to-pink-600",
+      stats: "85% Accuracy",
+      action: "Take Test",
+      delay: "animate-fadeInUp",
+    },
+    {
+      id: "steam",
+      icon: TrendingUp,
+      title: "STEAM Suggestions",
+      description: "Personalized Science, Tech, Engineering, Arts & Math paths",
+      color: "bg-gradient-to-br from-blue-500 to-cyan-600",
+      stats: "200+ Paths",
+      action: "Explore",
+      delay: "animate-fadeInUp animation-delay-100",
+    },
+    {
+      id: "career",
+      icon: Target,
+      title: "Course to Career",
+      description: "Map your educational journey to dream career",
+      color: "bg-gradient-to-br from-green-500 to-emerald-600",
+      stats: "500+ Careers",
+      action: "Start Planning",
+      delay: "animate-fadeInUp animation-delay-200",
+    },
+    {
+      id: "colleges",
+      icon: MapPin,
+      title: "Nearby Colleges Directory",
+      description: "Find government colleges in your area",
+      color: "bg-gradient-to-br from-orange-500 to-red-600",
+      stats: "1000+ Colleges",
+      action: "Search",
+      delay: "animate-fadeInUp animation-delay-300",
+    },
+    {
+      id: "cutoff",
+      icon: Award,
+      title: "Cut-off & Eligibility",
+      description: "Latest admission requirements and cut-off marks",
+      color: "bg-gradient-to-br from-indigo-500 to-purple-600",
+      stats: "Updated Daily",
+      action: "Check Now",
+      delay: "animate-fadeInUp animation-delay-400",
+    },
+    {
+      id: "multilingual",
+      icon: Globe,
+      title: "Multilingual Support",
+      description: "Available in 12+ regional languages",
+      color: "bg-gradient-to-br from-teal-500 to-blue-600",
+      stats: "12 Languages",
+      action: "Switch Language",
+      delay: "animate-fadeInUp animation-delay-500",
+    },
+    {
+      id: "scholarship",
+      icon: DollarSign,
+      title: "Scholarship Info",
+      description: "Find financial aid and scholarship opportunities",
+      color: "bg-gradient-to-br from-yellow-500 to-orange-600",
+      stats: "₹50L+ Available",
+      action: "Apply Now",
+      delay: "animate-fadeInUp animation-delay-600",
+    },
+    {
+      id: "timeline",
+      icon: Calendar,
+      title: "Admission Timeline",
+      description: "Never miss important application deadlines",
+      color: "bg-gradient-to-br from-pink-500 to-rose-600",
+      stats: "30+ Exams",
+      action: "Track",
+      delay: "animate-fadeInUp animation-delay-700",
+    },
   ];
 
   const innovativeFeatures = [
-    { icon: Star, title: 'Quality', desc: 'Top-ranked programs', color: 'bg-yellow-100 text-yellow-600' },
-    { icon: Clock, title: 'Timely', desc: 'Efficient learning paths', color: 'bg-red-100 text-red-600' },
-    { icon: Target, title: 'Focused', desc: 'Career-oriented approach', color: 'bg-indigo-100 text-indigo-600' },
-    { icon: Zap, title: 'Dynamic', desc: 'Modern teaching methods', color: 'bg-teal-100 text-teal-600' },
+    {
+      id: "aicareer",
+      icon: Brain,
+      title: "AI Career Planning",
+      description: "24/7 personalized guidance chatbot",
+      color: "bg-gradient-to-br from-violet-500 to-purple-600",
+      link: "/dashboard/aicareer", // ✅ add link
+    },
+    {
+      id: "virtual",
+      icon: PlayCircle,
+      title: "Virtual Campus Tours",
+      description: "360° immersive college experiences",
+      color: "bg-gradient-to-br from-cyan-500 to-blue-600",
+    },
+    {
+      id: "peerconnect",
+      icon: Users,
+      title: "Peer Connect",
+      description: "Connect with students in similar fields",
+      color: "bg-gradient-to-br from-green-500 to-teal-600",
+    },
+    {
+      id: "mentorship",
+      icon: Globe,
+      title: "Industry Mentorship",
+      description: "Connect with professionals in your field",
+      color: "bg-gradient-to-br from-orange-500 to-red-600",
+    },
   ];
 
-  useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Sidebar */}
-      <aside className="w-20 lg:w-64 bg-white shadow-lg transition-all duration-300">
-        <div className="p-4 flex items-center justify-center lg:justify-start">
-          <BookOpen className="w-8 h-8 text-blue-600" />
-          <span className="hidden lg:block ml-2 font-bold text-xl">EduWorld</span>
-        </div>
-        <nav className="mt-8">
-          {sidebarItems.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center p-4 hover:bg-blue-50 transition-colors cursor-pointer animate-fadeInUp"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <item.icon className="w-6 h-6 text-gray-600" />
-              <span className="hidden lg:block ml-3 text-gray-700">{item.label}</span>
-            </div>
-          ))}
+      <aside className="w-64 bg-white shadow-lg fixed left-0 top-0 h-full p-6 overflow-y-auto">
+        <h2 className="text-2xl font-bold mb-8 text-gray-800">Dashboard</h2>
+        <nav>
+          <ul className="space-y-3">
+            {sidebarOptions.map((option, index) => (
+              <li
+                key={option.id}
+                className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all duration-300 ${
+                  activeSection === option.id
+                    ? "bg-blue-50 text-blue-600 shadow-sm"
+                    : "text-gray-600 hover:bg-gray-50"
+                } ${
+                  mounted ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
+                }`}
+                style={{ animationDelay: `${index * 0.1}s` }}
+                onClick={() => setActiveSection(option.id)}
+              >
+                <option.icon className="w-5 h-5" />
+                <span className="font-medium">{option.label}</span>
+              </li>
+            ))}
+          </ul>
         </nav>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-6 lg:p-8">
+      <main className="flex-1 ml-64 p-8">
         {/* Header */}
-        <header className="flex flex-col lg:flex-row justify-between items-center mb-8 gap-4 animate-fadeInDown">
-          <div className="flex items-center w-full lg:w-auto">
-            <Search className="w-5 h-5 text-gray-400 absolute ml-3" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full lg:w-80 pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            />
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Welcome Rohit!</h1>
+          <div className="flex items-center space-x-4">
+            <Search className="w-5 h-5 text-gray-500 cursor-pointer" />
+            <Bell className="w-5 h-5 text-gray-500 cursor-pointer" />
+            <User className="w-8 h-8 text-gray-600 cursor-pointer" />
+            <Settings className="w-5 h-5 text-gray-500 cursor-pointer" />
           </div>
-          <div className="flex items-center gap-4">
-            <Bell className="w-6 h-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors" />
-            <Settings className="w-6 h-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors" />
-            <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors">
-              <User className="w-8 h-8 text-gray-600" />
-              <span className="hidden lg:block">Profile</span>
-              <ChevronRight className="w-4 h-4 text-gray-400 hidden lg:block" />
-            </div>
-          </div>
-        </header>
-
-        {/* Stats Grid */}
-        <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="bg-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow animate-fadeInUp"
-              style={{ animationDelay: `${0.2 + index * 0.1}s` }}
-            >
-              <div className="flex items-center gap-3 lg:gap-4">
-                <div className="p-3 bg-blue-50 rounded-lg">
-                  <stat.icon className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-gray-500 text-sm">{stat.label}</p>
-                  <h3 className="text-xl lg:text-2xl font-bold text-gray-800">{stat.value}</h3>
-                </div>
-              </div>
-            </div>
-          ))}
-        </section>
+        </div>
 
         {/* Core Features */}
-        <section className="mb-8">
-          <h2 className="text-2xl lg:text-3xl font-bold mb-6 animate-fadeInLeft">Core Features</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <section>
+          <h2 className="text-2xl font-semibold mb-6 text-gray-800">Core Features</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {coreFeatures.map((feature) => (
-              <div key={feature.id} className={`group cursor-pointer ${feature.delay}`}>
-                <div className="bg-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <div
-                    className={`w-10 h-10 lg:w-12 lg:h-12 ${feature.color} rounded-lg flex items-center justify-center mb-3 lg:mb-4 transition-transform duration-300 group-hover:scale-110`}
-                  >
-                    <feature.icon className="w-6 h-6 lg:w-7 lg:h-7" />
-                  </div>
-                  <h3 className="font-semibold text-gray-800 mb-1 lg:mb-2">{feature.title}</h3>
-                  <p className="text-gray-600 text-sm">{feature.desc}</p>
+              <div
+                key={feature.id}
+                className={`group cursor-pointer ${feature.delay} bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1`}
+              >
+                <div
+                  className={`w-10 h-10 lg:w-12 lg:h-12 ${feature.color} rounded-lg flex items-center justify-center mb-3 lg:mb-4 transition-transform duration-300 group-hover:scale-110`}
+                >
+                  <feature.icon className="w-6 h-6" />
                 </div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-800">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 text-sm">{feature.description}</p>
               </div>
             ))}
           </div>
         </section>
 
         {/* Innovative Features */}
-        <section>
-          <h2 className="text-2xl lg:text-3xl font-bold mb-6 animate-fadeInLeft">Innovative Features</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {innovativeFeatures.map((feature, index) => (
-              <div
-                key={index}
-                className="p-3 lg:p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-300 cursor-pointer hover-lift animate-fadeInUp"
-                style={{ animationDelay: `${0.6 + index * 0.1}s` }}
-              >
+        <section className="mt-12">
+          <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+            Innovative Features
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {innovativeFeatures.map((feature, index) => {
+              const Card = (
                 <div
-                  className={`w-8 h-8 lg:w-10 lg:h-10 ${feature.color} rounded-lg flex items-center justify-center transition-transform duration-300 hover:scale-110`}
+                  key={feature.id}
+                  className={`bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl transition-all duration-300 hover:shadow-md ${
+                    mounted ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+                  }`}
+                  style={{ animationDelay: `${0.6 + index * 0.1}s` }}
                 >
-                  <feature.icon className="w-5 h-5 lg:w-6 lg:h-6" />
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                      <feature.icon className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      {feature.title}
+                    </h3>
+                  </div>
+                  <p className="text-gray-600 text-sm">{feature.description}</p>
                 </div>
-                <h3 className="mt-2 lg:mt-3 font-semibold text-gray-800">{feature.title}</h3>
-                <p className="text-gray-600 text-xs lg:text-sm">{feature.desc}</p>
-              </div>
-            ))}
+              );
+
+              // ✅ Wrap AI Career Counselor with Link
+              return feature.link ? (
+                <Link to={feature.link} key={feature.id}>
+                  {Card}
+                </Link>
+              ) : (
+                Card
+              );
+            })}
           </div>
         </section>
       </main>

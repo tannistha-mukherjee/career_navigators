@@ -1,3 +1,4 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
@@ -13,8 +14,15 @@ function App() {
 
   return (
     <>
-      <Dashboard/>
-      {/* <AICareerCounselor/> */}
+      <Router>
+       <Routes>
+        {/* Route for Dashboard */}
+        <Route path="/dashboard" element={<Dashboard />} />
+
+        {/* Route for AI Career Counselor (nested under dashboard) */}
+        <Route path="/dashboard/aicareer" element={<AICareerCounselor />} />
+      </Routes>
+      </Router>
     </>
   );
 }

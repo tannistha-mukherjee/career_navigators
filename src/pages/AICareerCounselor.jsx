@@ -30,24 +30,134 @@ const AICareerCounselor = () => {
   const messagesEndRef = useRef(null);
 
   // Predefined conversation flow (shortened here — keep your full flow)
-  const conversationFlow = {
-    start: {
-      id: 'start',
-      question: "Hi there! I'm your AI Career Counselor. What brings you here today?",
-      options: [
-        { id: 'explore_careers', text: "I want to explore careers", next: 'interest_assessment' },
-        { id: 'specific_field', text: "I'm interested in a specific field", next: 'field_selection' }
-      ]
-    },
-    interest_assessment: {
-      id: 'interest_assessment',
-      question: "Which of these excites you the most?",
-      options: [
-        { id: 'problem_solving', text: "Solving problems", next: 'tech_interests' },
-        { id: 'creative_work', text: "Creating and designing things", next: 'creative_fields' }
-      ]
-    }
-  };
+  // inside AICareerCounselor.jsx
+
+// Predefined conversation flow (extended)
+const conversationFlow = {
+  start: {
+    id: 'start',
+    question: "Hi there! I'm your AI Career Counselor. What brings you here today?",
+    options: [
+      { id: 'explore_careers', text: "I want to explore careers", next: 'interest_assessment' },
+      { id: 'specific_field', text: "I'm interested in a specific field", next: 'field_selection' }
+    ]
+  },
+  interest_assessment: {
+    id: 'interest_assessment',
+    question: "Which of these excites you the most?",
+    options: [
+      { id: 'problem_solving', text: "Solving problems", next: 'tech_interests' },
+      { id: 'creative_work', text: "Creating and designing things", next: 'creative_fields' },
+      { id: 'helping_others', text: "Helping and guiding people", next: 'social_fields' }
+    ]
+  },
+  tech_interests: {
+    id: 'tech_interests',
+    question: "Do you enjoy working with numbers or building things?",
+    options: [
+      { id: 'coding', text: "I like coding and logical thinking", next: 'tech_paths' },
+      { id: 'hardware', text: "I prefer working with real-world systems", next: 'engineering_paths' }
+    ]
+  },
+  creative_fields: {
+    id: 'creative_fields',
+    question: "What kind of creativity excites you the most?",
+    options: [
+      { id: 'design', text: "Designing graphics, UI, or products", next: 'design_paths' },
+      { id: 'content', text: "Writing, media, or performing arts", next: 'media_paths' }
+    ]
+  },
+  social_fields: {
+    id: 'social_fields',
+    question: "Which of these appeals to you more?",
+    options: [
+      { id: 'teaching', text: "Teaching and mentoring others", next: 'education_paths' },
+      { id: 'healthcare', text: "Taking care of people’s health", next: 'healthcare_paths' }
+    ]
+  },
+  field_selection: {
+    id: 'field_selection',
+    question: "Great! Which field are you most curious about?",
+    options: [
+      { id: 'it', text: "Information Technology", next: 'tech_paths' },
+      { id: 'arts', text: "Arts and Design", next: 'design_paths' },
+      { id: 'business', text: "Business and Management", next: 'business_paths' }
+    ]
+  },
+
+  // Final recommendation nodes
+  tech_paths: {
+    id: 'tech_paths',
+    isRecommendation: true,
+    question: "Based on your interest, here are some career paths you can follow:",
+    recommendations: [
+      { title: "Software Engineer", description: "Develop apps, websites, or AI systems." },
+      { title: "Data Scientist", description: "Analyze data to solve real-world problems." },
+      { title: "Cybersecurity Analyst", description: "Protect systems and networks from threats." }
+    ]
+  },
+  engineering_paths: {
+    id: 'engineering_paths',
+    isRecommendation: true,
+    question: "Here are career paths you can consider:",
+    recommendations: [
+      { title: "Mechanical Engineer", description: "Design and build machines or systems." },
+      { title: "Civil Engineer", description: "Plan and construct infrastructure projects." },
+      { title: "Electrical Engineer", description: "Work with power systems and electronics." }
+    ]
+  },
+  design_paths: {
+    id: 'design_paths',
+    isRecommendation: true,
+    question: "You seem creative! Possible career options are:",
+    recommendations: [
+      { title: "UI/UX Designer", description: "Design user-friendly digital experiences." },
+      { title: "Graphic Designer", description: "Create impactful visuals and branding." },
+      { title: "Product Designer", description: "Design everyday products and solutions." }
+    ]
+  },
+  media_paths: {
+    id: 'media_paths',
+    isRecommendation: true,
+    question: "Your interest in content suggests these paths:",
+    recommendations: [
+      { title: "Writer/Journalist", description: "Communicate stories and ideas." },
+      { title: "Film/Media Professional", description: "Work in video production or broadcasting." },
+      { title: "Performer", description: "Build a career in arts, theatre, or music." }
+    ]
+  },
+  education_paths: {
+    id: 'education_paths',
+    isRecommendation: true,
+    question: "If you like helping others through teaching, consider these:",
+    recommendations: [
+      { title: "Teacher/Professor", description: "Inspire and educate future generations." },
+      { title: "Counselor", description: "Guide students in their academic journeys." },
+      { title: "Researcher", description: "Contribute knowledge in your field of interest." }
+    ]
+  },
+  healthcare_paths: {
+    id: 'healthcare_paths',
+    isRecommendation: true,
+    question: "Healthcare is a rewarding field. Here are career paths:",
+    recommendations: [
+      { title: "Doctor/Nurse", description: "Work directly with patients’ health." },
+      { title: "Pharmacist", description: "Provide essential medicines and advice." },
+      { title: "Public Health Specialist", description: "Improve healthcare systems." }
+    ]
+  },
+  business_paths: {
+    id: 'business_paths',
+    isRecommendation: true,
+    question: "If business excites you, these could be your paths:",
+    recommendations: [
+      { title: "Entrepreneur", description: "Build and grow your own company." },
+      { title: "Marketing Manager", description: "Promote brands and products effectively." },
+      { title: "Financial Analyst", description: "Advise on investments and finances." }
+    ]
+  }
+};
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -154,7 +264,7 @@ const AICareerCounselor = () => {
                   <MessageSquare className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">AI Career Counselor</h1>
+                  <h1 className="text-xl font-bold text-gray-900">AI Career Planning</h1>
                   <p className="text-sm text-gray-600">Your personalized assistant</p>
                 </div>
               </div>
