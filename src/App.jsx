@@ -17,7 +17,7 @@ function App() {
       <Router>
        <Routes>
         {/* Route for Dashboard */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/" element={<Dashboard />} />
 
         {/* Route for AI Career Counselor (nested under dashboard) */}
         <Route path="/dashboard/aicareer" element={<AICareerCounselor />} />
