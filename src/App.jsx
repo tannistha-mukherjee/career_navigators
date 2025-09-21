@@ -14,7 +14,7 @@ import Home from "./pages/Home";
 import VirtualTour from "./pages/VirtualTour";
  import AiCareer from "./pages/AICareerCounselor";
  
-//import GameRoadmapVisualizer from "./pages/GameRoadmapVisualizer";
+import GameRoadmapVisualizer from "./pages/GameRoadmapVisualizer";
 import Roadmap from "./pages/Roadmap";
 import Timeline from "./pages/Timeline";
 
@@ -41,8 +41,9 @@ const App = () => {
               <Route path="/cutoff" element={<Cutoff />} />
               <Route path="/scholarship" element={<Scholarship />} />
               <Route path="/timeline" element={<Timeline />} />
-              <Route path="/roadmap" element={<GameRoadmapVisualizer/>} />
+              
               <Route path="/analytics" element={<Analytics />} /> */}
+              <Route path="/roadmap" element={<GameRoadmapVisualizer/>} />
               <Route path="/timeline" element={<Timeline />}/>
               <Route path="/roadmap2" element={<Roadmap/>} />
               <Route path="/aptitude" element={<Aptitude />}/>
