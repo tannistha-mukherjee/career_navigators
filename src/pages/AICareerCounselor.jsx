@@ -1,186 +1,225 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  MessageSquare, 
-  Send, 
-  Bot, 
-  User, 
-  ArrowLeft, 
-  Sparkles, 
-  Brain, 
-  TrendingUp, 
-  Target, 
-  BookOpen,
-  RefreshCw,
-  Download,
-  Share2,
-  Lightbulb,
-  MapPin,
-  Award,
-  Menu,
-  X
-} from 'lucide-react';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { MessageSquare, Bot, ArrowLeft, RefreshCw } from "lucide-react";
+import Aptitude from "./Aptitude";
 
 const AICareerCounselor = () => {
   const [messages, setMessages] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   const [chatStarted, setChatStarted] = useState(false);
-  const [recommendations, setRecommendations] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showAptitude, setShowAptitude] = useState(false);
   const messagesEndRef = useRef(null);
+  const navigate = useNavigate();
 
-  // Predefined conversation flow (shortened here — keep your full flow)
-  // inside AICareerCounselor.jsx
-
-// Predefined conversation flow (extended)
-const conversationFlow = {
-  start: {
-    id: 'start',
-    question: "Hi there! I'm your AI Career Counselor. What brings you here today?",
-    options: [
-      { id: 'explore_careers', text: "I want to explore careers", next: 'interest_assessment' },
-      { id: 'specific_field', text: "I'm interested in a specific field", next: 'field_selection' }
-    ]
-  },
-  interest_assessment: {
-    id: 'interest_assessment',
-    question: "Which of these excites you the most?",
-    options: [
-      { id: 'problem_solving', text: "Solving problems", next: 'tech_interests' },
-      { id: 'creative_work', text: "Creating and designing things", next: 'creative_fields' },
-      { id: 'helping_others', text: "Helping and guiding people", next: 'social_fields' }
-    ]
-  },
-  tech_interests: {
-    id: 'tech_interests',
-    question: "Do you enjoy working with numbers or building things?",
-    options: [
-      { id: 'coding', text: "I like coding and logical thinking", next: 'tech_paths' },
-      { id: 'hardware', text: "I prefer working with real-world systems", next: 'engineering_paths' }
-    ]
-  },
-  creative_fields: {
-    id: 'creative_fields',
-    question: "What kind of creativity excites you the most?",
-    options: [
-      { id: 'design', text: "Designing graphics, UI, or products", next: 'design_paths' },
-      { id: 'content', text: "Writing, media, or performing arts", next: 'media_paths' }
-    ]
-  },
-  social_fields: {
-    id: 'social_fields',
-    question: "Which of these appeals to you more?",
-    options: [
-      { id: 'teaching', text: "Teaching and mentoring others", next: 'education_paths' },
-      { id: 'healthcare', text: "Taking care of people’s health", next: 'healthcare_paths' }
-    ]
-  },
-  field_selection: {
-    id: 'field_selection',
-    question: "Great! Which field are you most curious about?",
-    options: [
-      { id: 'it', text: "Information Technology", next: 'tech_paths' },
-      { id: 'arts', text: "Arts and Design", next: 'design_paths' },
-      { id: 'business', text: "Business and Management", next: 'business_paths' }
-    ]
-  },
-
-  // Final recommendation nodes
-  tech_paths: {
-    id: 'tech_paths',
-    isRecommendation: true,
-    question: "Based on your interest, here are some career paths you can follow:",
-    recommendations: [
-      { title: "Software Engineer", description: "Develop apps, websites, or AI systems." },
-      { title: "Data Scientist", description: "Analyze data to solve real-world problems." },
-      { title: "Cybersecurity Analyst", description: "Protect systems and networks from threats." }
-    ]
-  },
-  engineering_paths: {
-    id: 'engineering_paths',
-    isRecommendation: true,
-    question: "Here are career paths you can consider:",
-    recommendations: [
-      { title: "Mechanical Engineer", description: "Design and build machines or systems." },
-      { title: "Civil Engineer", description: "Plan and construct infrastructure projects." },
-      { title: "Electrical Engineer", description: "Work with power systems and electronics." }
-    ]
-  },
-  design_paths: {
-    id: 'design_paths',
-    isRecommendation: true,
-    question: "You seem creative! Possible career options are:",
-    recommendations: [
-      { title: "UI/UX Designer", description: "Design user-friendly digital experiences." },
-      { title: "Graphic Designer", description: "Create impactful visuals and branding." },
-      { title: "Product Designer", description: "Design everyday products and solutions." }
-    ]
-  },
-  media_paths: {
-    id: 'media_paths',
-    isRecommendation: true,
-    question: "Your interest in content suggests these paths:",
-    recommendations: [
-      { title: "Writer/Journalist", description: "Communicate stories and ideas." },
-      { title: "Film/Media Professional", description: "Work in video production or broadcasting." },
-      { title: "Performer", description: "Build a career in arts, theatre, or music." }
-    ]
-  },
-  education_paths: {
-    id: 'education_paths',
-    isRecommendation: true,
-    question: "If you like helping others through teaching, consider these:",
-    recommendations: [
-      { title: "Teacher/Professor", description: "Inspire and educate future generations." },
-      { title: "Counselor", description: "Guide students in their academic journeys." },
-      { title: "Researcher", description: "Contribute knowledge in your field of interest." }
-    ]
-  },
-  healthcare_paths: {
-    id: 'healthcare_paths',
-    isRecommendation: true,
-    question: "Healthcare is a rewarding field. Here are career paths:",
-    recommendations: [
-      { title: "Doctor/Nurse", description: "Work directly with patients’ health." },
-      { title: "Pharmacist", description: "Provide essential medicines and advice." },
-      { title: "Public Health Specialist", description: "Improve healthcare systems." }
-    ]
-  },
-  business_paths: {
-    id: 'business_paths',
-    isRecommendation: true,
-    question: "If business excites you, these could be your paths:",
-    recommendations: [
-      { title: "Entrepreneur", description: "Build and grow your own company." },
-      { title: "Marketing Manager", description: "Promote brands and products effectively." },
-      { title: "Financial Analyst", description: "Advise on investments and finances." }
-    ]
-  }
-};
-
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const conversationFlow = {
+    start: {
+      id: "start",
+      question:
+        "Hi there! I'm your AI Career Counselor. To guide you better, tell me why you’re here?",
+      options: [
+        {
+          id: "explore_careers",
+          text: "I want to explore career options",
+          next: "interest_assessment",
+        },
+        {
+          id: "specific_field",
+          text: "I already have a field in mind",
+          next: "field_selection",
+        },
+      ],
+    },
+    interest_assessment: {
+      id: "interest_assessment",
+      question: "What excites you most in daily life?",
+      options: [
+        {
+          id: "problem_solving",
+          text: "Solving logical or analytical problems",
+          next: "tech_interests",
+        },
+        {
+          id: "creative_work",
+          text: "Building, designing or expressing creativity",
+          next: "creative_fields",
+        },
+        {
+          id: "helping_others",
+          text: "Helping, teaching, or supporting people",
+          next: "social_fields",
+        },
+      ],
+    },
+    tech_interests: {
+      id: "tech_interests",
+      question: "Great! Which describes you better?",
+      options: [
+        {
+          id: "coding",
+          text: "I enjoy coding, data, and digital tools",
+          next: "study_background",
+        },
+        {
+          id: "hardware",
+          text: "I prefer machines, circuits, and real-world systems",
+          next: "engineering_paths",
+        },
+      ],
+    },
+    study_background: {
+      id: "study_background",
+      question: "What is your current education background?",
+      options: [
+        {
+          id: "highschool",
+          text: "High school / Intermediate",
+          next: "career_goals",
+        },
+        {
+          id: "bachelors",
+          text: "Bachelor’s degree (B.Tech, B.Sc, etc.)",
+          next: "career_goals",
+        },
+        { id: "masters", text: "Master’s degree", next: "career_goals" },
+      ],
+    },
+    career_goals: {
+      id: "career_goals",
+      question: "What’s your long-term career goal?",
+      options: [
+        { id: "research", text: "Research and innovation", next: "tech_paths" },
+        {
+          id: "corporate",
+          text: "Corporate / Industry job",
+          next: "tech_paths",
+        },
+        { id: "startup", text: "Build my own startup", next: "business_paths" },
+      ],
+    },
+    field_selection: {
+      id: "field_selection",
+      question: "Awesome! Which field do you want to explore?",
+      options: [
+        { id: "it", text: "Information Technology", next: "tech_paths" },
+        { id: "arts", text: "Arts and Design", next: "design_paths" },
+        {
+          id: "business",
+          text: "Business and Management",
+          next: "business_paths",
+        },
+      ],
+    },
+    tech_paths: {
+      id: "tech_paths",
+      isRecommendation: true,
+      question: "Here are some tech career paths for you:",
+      recommendations: [
+        {
+          title: "Software Engineer",
+          description: "Develop apps, websites, or AI systems.",
+          link: "/roadmap",
+        },
+        {
+          title: "Data Scientist",
+          description: "Analyze data to solve real-world problems.",
+          link: "/roadmap/data-scientist",
+        },
+        {
+          title: "Cybersecurity Analyst",
+          description: "Protect systems and networks from threats.",
+          link: "/roadmap/cybersecurity",
+        },
+      ],
+    },
+    engineering_paths: {
+      id: "engineering_paths",
+      isRecommendation: true,
+      question: "Here are engineering career options:",
+      recommendations: [
+        {
+          title: "Mechanical Engineer",
+          description: "Work with machines and robotics.",
+          link: "/roadmap/mechanical-engineer",
+        },
+        {
+          title: "Civil Engineer",
+          description: "Design and manage construction projects.",
+          link: "/roadmap/civil-engineer",
+        },
+        {
+          title: "Electrical Engineer",
+          description: "Specialize in electronics and power systems.",
+          link: "/roadmap/electrical-engineer",
+        },
+      ],
+    },
+    design_paths: {
+      id: "design_paths",
+      isRecommendation: true,
+      question: "Creative career options for you:",
+      recommendations: [
+        {
+          title: "UI/UX Designer",
+          description: "Design user-friendly digital interfaces.",
+          link: "/roadmap/uiux-designer",
+        },
+        {
+          title: "Graphic Designer",
+          description: "Work in branding and visuals.",
+          link: "/roadmap/graphic-designer",
+        },
+        {
+          title: "Product Designer",
+          description: "Create innovative physical/digital products.",
+          link: "/roadmap/product-designer",
+        },
+      ],
+    },
+    business_paths: {
+      id: "business_paths",
+      isRecommendation: true,
+      question: "Business and management paths for you:",
+      recommendations: [
+        {
+          title: "Entrepreneur",
+          description: "Start and grow your business.",
+          link: "/roadmap/entrepreneur",
+        },
+        {
+          title: "Marketing Manager",
+          description: "Manage brands and campaigns.",
+          link: "/roadmap/marketing-manager",
+        },
+        {
+          title: "Financial Analyst",
+          description: "Guide financial decisions.",
+          link: "/roadmap/financial-analyst",
+        },
+      ],
+    },
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const scrollToBottom = () =>
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+
+  useEffect(() => scrollToBottom(), [messages]);
 
   const startChat = () => {
     setChatStarted(true);
     setIsTyping(true);
-
     setTimeout(() => {
       const startNode = conversationFlow.start;
       setCurrentQuestion(startNode);
-      setMessages([{
-        id: Date.now(),
-        type: 'bot',
-        content: startNode.question,
-        options: startNode.options,
-        timestamp: new Date()
-      }]);
+      setMessages([
+        {
+          id: Date.now(),
+          type: "bot",
+          content: startNode.question,
+          options: startNode.options,
+          timestamp: new Date(),
+        },
+      ]);
       setIsTyping(false);
     }, 1500);
   };
@@ -188,63 +227,45 @@ const conversationFlow = {
   const handleOptionClick = (option) => {
     const userMessage = {
       id: Date.now(),
-      type: 'user',
+      type: "user",
       content: option.text,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
-
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setIsTyping(true);
 
     setTimeout(() => {
-      const nextNode = conversationFlow[option.next];
-      if (nextNode) {
+      if (option.id === "it") {
         const botMessage = {
           id: Date.now() + 1,
-          type: 'bot',
-          content: nextNode.question,
-          options: nextNode.options,
-          recommendations: nextNode.recommendations,
-          isRecommendation: nextNode.isRecommendation,
-          timestamp: new Date()
+          type: "bot",
+          content: "Before suggesting IT careers, take this aptitude test:",
+          options: [{ id: "start_aptitude", text: "Start Aptitude Test" }],
+          timestamp: new Date(),
         };
-
-        setMessages(prev => [...prev, botMessage]);
-        setCurrentQuestion(nextNode);
-
-        if (nextNode.recommendations) {
-          setRecommendations(nextNode.recommendations);
+        setMessages((prev) => [...prev, botMessage]);
+        setCurrentQuestion(botMessage);
+      } else if (option.id === "start_aptitude") {
+        setShowAptitude(true);
+      } else {
+        const nextNode = conversationFlow[option.next];
+        if (nextNode) {
+          const botMessage = {
+            id: Date.now() + 1,
+            type: "bot",
+            content: nextNode.question,
+            options: nextNode.options,
+            recommendations: nextNode.recommendations,
+            isRecommendation: nextNode.isRecommendation,
+            timestamp: new Date(),
+          };
+          setMessages((prev) => [...prev, botMessage]);
+          setCurrentQuestion(nextNode);
         }
-      } else if (option.next === 'end') {
-        const endMessage = {
-          id: Date.now() + 1,
-          type: 'bot',
-          content: "Thanks for using AI Career Counselor! 🌟",
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, endMessage]);
-        setCurrentQuestion(null);
       }
       setIsTyping(false);
-    }, 2000);
+    }, 1500);
   };
-
-  const resetChat = () => {
-    setMessages([]);
-    setCurrentQuestion(null);
-    setChatStarted(false);
-    setRecommendations([]);
-  };
-
-  const RecommendationCard = ({ recommendation }) => (
-    <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-4 mb-4 hover:shadow-lg transition-all duration-300">
-      <div className="flex items-start justify-between mb-3">
-        <h4 className="font-bold text-lg text-gray-900">{recommendation.title}</h4>
-        <Target className="h-6 w-6 text-blue-600" />
-      </div>
-      <p className="text-gray-700 mb-4">{recommendation.description}</p>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -254,7 +275,7 @@ const conversationFlow = {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => window.history.back()}
+                onClick={() => navigate(-1)}
                 className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <ArrowLeft className="h-5 w-5 text-gray-600" />
@@ -264,18 +285,28 @@ const conversationFlow = {
                   <MessageSquare className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">AI Career Planning</h1>
-                  <p className="text-sm text-gray-600">Your personalized assistant</p>
+                  <h1 className="text-xl font-bold text-gray-900">
+                    AI Career Planning
+                  </h1>
+                  <p className="text-sm text-gray-600">
+                    Your personalized assistant
+                  </p>
                 </div>
               </div>
             </div>
             {chatStarted && (
               <button
-                onClick={resetChat}
+                onClick={() => {
+                  setMessages([]);
+                  setCurrentQuestion(null);
+                  setChatStarted(false);
+                }}
                 className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               >
                 <RefreshCw className="h-4 w-4" />
-                <span className="hidden sm:block text-sm font-medium">Reset</span>
+                <span className="hidden sm:block text-sm font-medium">
+                  Reset
+                </span>
               </button>
             )}
           </div>
@@ -283,73 +314,127 @@ const conversationFlow = {
       </div>
 
       <div className="flex h-full">
-        {/* Chat Area */}
-        <div className="flex-1 flex flex-col">
-          {!chatStarted ? (
-            // Welcome
-            <div className="flex-1 flex items-center justify-center p-6">
-              <div className="max-w-2xl mx-auto text-center">
-                <div className="bg-gradient-to-br from-blue-500 to-purple-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                  <Bot className="h-10 w-10 text-white" />
-                </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Welcome</h2>
-                <p className="text-lg text-gray-600 mb-8">
-                  I'm here to guide your career journey.
-                </p>
-                <button
-                  onClick={startChat}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg"
+        {showAptitude ? (
+          <div className="flex-1 overflow-y-auto p-4">
+            <Aptitude
+              onComplete={(score) => {
+                setShowAptitude(false);
+                const itNode =
+                  score < 3
+                    ? {
+                        question:
+                          "Based on your score, start with basic IT courses:",
+                        recommendations: [
+                          {
+                            title: "Programming Basics",
+                            description: "Learn Python or JavaScript.",
+                            link: "/roadmap/programming-basics",
+                          },
+                          {
+                            title: "Web Development",
+                            description: "HTML, CSS, JS.",
+                            link: "/roadmap/web-development",
+                          },
+                        ],
+                        isRecommendation: true,
+                      }
+                    : conversationFlow.tech_paths;
+
+                setMessages((prev) => [
+                  ...prev,
+                  {
+                    id: Date.now(),
+                    type: "bot",
+                    content: itNode.question,
+                    recommendations: itNode.recommendations,
+                    isRecommendation: true,
+                    timestamp: new Date(),
+                  },
+                ]);
+              }}
+            />
+          </div>
+        ) : !chatStarted ? (
+          <div className="flex-1 flex items-center justify-center p-6">
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="bg-gradient-to-br from-blue-500 to-purple-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <Bot className="h-10 w-10 text-white" />
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Welcome</h2>
+              <p className="text-lg text-gray-600 mb-8">
+                I'm here to guide your career journey.
+              </p>
+              <button
+                onClick={startChat}
+                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg"
+              >
+                Start Counseling
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${
+                    message.type === "user" ? "justify-end" : "justify-start"
+                  }`}
                 >
-                  Start Counseling
-                </button>
-              </div>
-            </div>
-          ) : (
-            // Chat Interface
-            <div className="flex-1 flex flex-col">
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {messages.map((message) => (
                   <div
-                    key={message.id}
-                    className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`max-w-xs sm:max-w-md p-3 rounded-xl ${
+                      message.type === "user"
+                        ? "bg-blue-500 text-white"
+                        : "bg-white border border-gray-200 text-gray-800"
+                    }`}
                   >
-                    <div className={`max-w-xs sm:max-w-md p-3 rounded-xl ${
-                      message.type === 'user' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-white border border-gray-200 text-gray-800'
-                    }`}>
-                      <p>{message.content}</p>
-                      {message.isRecommendation && message.recommendations?.map((rec, i) => (
-                        <RecommendationCard key={i} recommendation={rec} />
+                    <p>{message.content}</p>
+
+                    {/* Options */}
+                    {message.options &&
+                      message.options.map((opt) => (
+                        <button
+                          key={opt.id}
+                          onClick={() => handleOptionClick(opt)}
+                          className="mt-2 w-full text-left px-3 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg text-sm font-medium text-blue-700"
+                        >
+                          {opt.text}
+                        </button>
                       ))}
-                      {message.options && (
-                        <div className="mt-3 space-y-2">
-                          {message.options.map((opt) => (
-                            <button
-                              key={opt.id}
-                              onClick={() => handleOptionClick(opt)}
-                              className="w-full bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-sm"
-                            >
-                              {opt.text}
-                            </button>
-                          ))}
+
+                    {/* Recommendations */}
+                    {message.isRecommendation &&
+                      message.recommendations?.map((rec, i) => (
+                        <div
+                          key={i}
+                          onClick={() => rec.link && navigate(rec.link)}
+                          className="cursor-pointer bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-4 mt-3 hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+                        >
+                          <h4 className="font-bold text-lg text-gray-900">
+                            {rec.title}
+                          </h4>
+                          <p className="text-gray-700">{rec.description}</p>
+                          {rec.link && (
+                            <p className="mt-3 text-sm text-blue-600 underline">
+                              View Roadmap →
+                            </p>
+                          )}
                         </div>
-                      )}
-                    </div>
+                      ))}
                   </div>
-                ))}
-                {isTyping && (
-                  <div className="flex justify-start">
-                    <div className="bg-white border border-gray-200 rounded-xl px-3 py-2">
-                      <span className="animate-pulse">Typing...</span>
-                    </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
             </div>
-          )}
-        </div>
+
+            {isTyping && (
+              <div className="px-4 py-2 text-sm text-gray-500">
+                Counselor is typing...
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
