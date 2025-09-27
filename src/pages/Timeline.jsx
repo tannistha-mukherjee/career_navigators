@@ -17,6 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 const AdmissionTracker = () => {
   const [currentStep, setCurrentStep] = useState(2);
   const [expandedStep, setExpandedStep] = useState(null);
+  const [notifyOn, setNotifyOn] = useState(true);
 
   const steps = [
     {
@@ -95,17 +96,22 @@ const AdmissionTracker = () => {
     return current ? `${current.title}, ${current.date}` : "";
   };
 
-  // ✅ Function to show toast
+  // Function to handle notify toggle and toast
   const handleNotify = () => {
-    toast.success("Notifications turned on!", {
-      position: "top-right",
-      autoClose: 5000, // 5 sec
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
+    const nextValue = !notifyOn;
+    setNotifyOn(nextValue);
+    toast[nextValue ? "success" : "info"](
+      nextValue ? "Notifications turned on!" : "Notifications turned off!",
+      {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      }
+    );
   };
 
   return (
@@ -120,13 +126,16 @@ const AdmissionTracker = () => {
                 Track your admission journey
               </p>
             </div>
-            
-            {/* ✅ Notify Me Button */}
+            {/* Notify Me Button */}
             <button
               onClick={handleNotify}
-              className="bg-yellow-400 text-black font-semibold px-5 py-2 rounded-lg shadow hover:bg-yellow-500 transition"
+              className={`font-semibold px-5 py-2 rounded-lg shadow transition ml-2 ${
+                notifyOn
+                  ? "bg-yellow-400 text-black hover:bg-yellow-500"
+                  : "bg-gray-300 text-gray-700 hover:bg-gray-400"
+              }`}
             >
-              Notify Me
+              {notifyOn ? "Notify Me" : "Off Notify"}
             </button>
           </div>
         </div>
