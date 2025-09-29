@@ -132,7 +132,7 @@ const AICareerCounselor = () => {
         {
           id: "engineering_interest",
           text: "Engineering & Technology",
-          next: "aptitude_test_12",
+          next: "software_exam_check",
         },
         {
           id: "medical_interest",
@@ -161,6 +161,25 @@ const AICareerCounselor = () => {
         },
       ],
     },
+
+    software_exam_check: {
+    id: "software_exam_check",
+    question: "Have you appeared for any competitive exam for engineering admission?",
+    options: [
+      { id: "appeared_wbjee", text: "WBJEE", next: "exam_rank_input" },
+      { id: "appeared_jee_main", text: "JEE Main", next: "exam_rank_input" },
+      { id: "appeared_both", text: "Both WBJEE & JEE Main", next: "exam_rank_input" },
+      { id: "not_appeared", text: "No, I have not appeared", next: "career_options_12" },
+    ],
+  },
+
+  exam_rank_input: {
+    id: "exam_rank_input",
+    question: "Please enter your exam ranks. If you don’t have a category rank, type NA.",
+    requiresInput: true,
+    inputType: "exam_ranks",
+    next: "aptitude_test_12",
+  },
 
     aptitude_test_12: {
       id: "aptitude_test_12",
@@ -450,21 +469,24 @@ const AICareerCounselor = () => {
   };
 
   const handleResultsInput = (grade, results) => {
-    setUserResults(results);
+  if (grade === "exam_ranks") {
+    // Save the exam ranks
+    setUserResults(prev => ({ ...prev, examRanks: results }));
     setShowResultInput(false);
 
     const userMessage = {
       id: Date.now(),
       type: "user",
-      content: `My ${grade} results: Overall ${results.overall}% | Key subjects: ${Object.entries(results.subjects).map(([sub, mark]) => `${sub}: ${mark}%`).join(', ')}`,
+      content: `WBJEE General: ${results.wbjeeGeneral}, WBJEE Category: ${results.wbjeeCategory}, JEE Main General: ${results.jeeGeneral}, JEE Main Category: ${results.jeeCategory}`,
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
 
     setTimeout(() => {
-      const nextNode = conversationFlow[grade === "10th" ? "class_10_interest" : "class_12_interest"];
+      // After submitting ranks, we move to the next question
+      const nextNode = conversationFlow.aptitude_test_12;
       const botMessage = {
         id: Date.now() + 1,
         type: "bot",
@@ -472,11 +494,44 @@ const AICareerCounselor = () => {
         options: nextNode.options,
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, botMessage]);
+      setMessages(prev => [...prev, botMessage]);
       setCurrentQuestion(nextNode);
       setIsTyping(false);
-    }, 1500);
+    }, 1200);
+    return;
+  }
+
+  // ---------- existing logic for 10th and 12th ----------
+  setUserResults(results);
+  setShowResultInput(false);
+
+  const userMessage = {
+    id: Date.now(),
+    type: "user",
+    content: `My ${grade} results: Overall ${results.overall}% | Key subjects: ${Object.entries(results.subjects)
+      .map(([sub, mark]) => `${sub}: ${mark}%`)
+      .join(", ")}`,
+    timestamp: new Date(),
   };
+
+  setMessages(prev => [...prev, userMessage]);
+  setIsTyping(true);
+
+  setTimeout(() => {
+    const nextNode = conversationFlow[grade === "10th" ? "class_10_interest" : "class_12_interest"];
+    const botMessage = {
+      id: Date.now() + 1,
+      type: "bot",
+      content: nextNode.question,
+      options: nextNode.options,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, botMessage]);
+    setCurrentQuestion(nextNode);
+    setIsTyping(false);
+  }, 1500);
+};
+
 
   const handleOptionClick = (option) => {
     const userMessage = {
@@ -627,6 +682,56 @@ const AICareerCounselor = () => {
       </div>
     );
   };
+  const ExamRankInputForm = ({ onSubmit }) => {
+  const [wbjeeGeneral, setWbjeeGeneral] = useState("");
+  const [wbjeeCategory, setWbjeeCategory] = useState("");
+  const [jeeGeneral, setJeeGeneral] = useState("");
+  const [jeeCategory, setJeeCategory] = useState("");
+
+  const handleSubmit = () => {
+    onSubmit("exam_ranks", {
+      wbjeeGeneral: wbjeeGeneral || "NA",
+      wbjeeCategory: wbjeeCategory || "NA",
+      jeeGeneral: jeeGeneral || "NA",
+      jeeCategory: jeeCategory || "NA",
+    });
+  };
+
+  const fields = [
+    { label: "WBJEE General Rank", state: wbjeeGeneral, setState: setWbjeeGeneral },
+    { label: "WBJEE Category Rank", state: wbjeeCategory, setState: setWbjeeCategory, isCategory: true },
+    { label: "JEE Main General Rank", state: jeeGeneral, setState: setJeeGeneral },
+    { label: "JEE Main Category Rank", state: jeeCategory, setState: setJeeCategory, isCategory: true },
+  ];
+
+  return (
+    <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200 max-w-md mx-auto">
+      <h3 className="text-lg font-semibold mb-4 text-gray-900">
+        Enter Your Exam Ranks
+      </h3>
+
+      {fields.map(({ label, state, setState, isCategory }) => (
+        <div key={label} className="mb-4">
+          <label className="block text-sm font-medium">{label}</label>
+          <input
+            type="text"
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+            placeholder={isCategory ? "e.g. 1234 or NA" : "e.g. 1234"}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      ))}
+
+      <button
+        onClick={handleSubmit}
+        className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors font-medium"
+      >
+        Submit Ranks
+      </button>
+    </div>
+  );
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -714,11 +819,15 @@ const AICareerCounselor = () => {
           </div>
         ) : showResultInput ? (
           <div className="flex-1 flex items-center justify-center p-4">
-            <ResultsInputForm
-              grade={userGrade}
-              inputType={currentQuestion?.inputType}
-              onSubmit={handleResultsInput}
-            />
+            {currentQuestion?.inputType === "exam_ranks" ? (
+              <ExamRankInputForm onSubmit={handleResultsInput} />
+            ) : (
+              <ResultsInputForm
+                grade={userGrade}
+                inputType={currentQuestion?.inputType}
+                onSubmit={handleResultsInput}
+              />
+            )}
           </div>
         ) : !chatStarted ? (
           <div className="flex-1 flex items-center justify-center p-6">
